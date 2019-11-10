@@ -1,0 +1,17 @@
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+#root {
+  padding: 50px 0;
+}
+
+.error {
+	border-color: #FF0000;
+
+}
+
+.error ::-webkit-placeholder {
+	color: #FF0000;
+}
