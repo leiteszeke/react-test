@@ -13,7 +13,9 @@ import {
   CARD_FETCHED_FAILED,
   CARD_FETCHED_SUCCESS,
   CARDS_FETCHED_FAILED,
-  CARDS_FETCHED_SUCCESS
+  CARDS_FETCHED_SUCCESS,
+  CARDS_IMPORT_FAILED,
+  CARDS_IMPORT_SUCCESS
 } from "../../actions";
 
 export function* addCard(action) {
@@ -95,10 +97,26 @@ export function* getCard(action) {
   }
 }
 
+export function* importCards(action) {
+  try {
+    const data = yield call(api.importCards, action.payload);
+
+    yield put({
+      type: CARDS_IMPORT_SUCCESS,
+      payload: {
+        cards: data
+      }
+    });
+  } catch (e) {
+    yield put({ type: CARDS_IMPORT_FAILED, message: e.message });
+  }
+}
+
 export default {
   addCard,
 	editCard,
 	deleteCard,
 	getCard,
-  fetchCards
+  fetchCards,
+  importCards
 };

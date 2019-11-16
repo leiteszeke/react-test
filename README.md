@@ -4,7 +4,7 @@ Welcome to Colvin Code Challenge!
 
 You can use this boilerplate to do the test (for example, forking this repository). After finish the test, please, send us an email to **frontend@thecolvinco.com** with the repository link. If you have any question, don't hesitate to contact us.
 
-# Exercise
+## Exercise
 
 ## Card game maker
 
@@ -21,7 +21,7 @@ We would love to see each of these features implemented but you are free to add 
 - Import/Export to JSON
 - Fetch cards from a remote path (Git...)
 
-# Technology
+## Technology
 
 Our stack is composed by the following technologies:
 
@@ -33,7 +33,7 @@ Our stack is composed by the following technologies:
 
 Feel free to use whatever stack you want. (React is a must 😬)
 
-# Bonus points
+## Bonus points
 
 - You follow clean coding practices.
 - You test the app.

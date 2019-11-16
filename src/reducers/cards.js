@@ -3,7 +3,8 @@ import {
 	CARD_DELETE_SUCCESS,
 	CARD_EDIT_SUCCESS,
 	CARD_FETCHED_SUCCESS,
-	CARDS_FETCHED_SUCCESS
+	CARDS_FETCHED_SUCCESS,
+	CARDS_IMPORT_SUCCESS
 } from "../actions";
 
 const initialState = {
@@ -17,6 +18,7 @@ export const cardReducer = (state = initialState, action) => {
 		case CARD_DELETE_SUCCESS:
 		case CARD_EDIT_SUCCESS:
 		case CARDS_FETCHED_SUCCESS:
+		case CARDS_IMPORT_SUCCESS:
 			return {
 				...state,
 				cards: action.payload.cards

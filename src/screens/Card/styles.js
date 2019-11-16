@@ -57,6 +57,6 @@ export const CardItem = styled(Row).attrs({
     font-size: 12px;
     text-align: left;
     width: 100%;
-    word-break: break-all;
+    word-break: break-word;
   }
 `;

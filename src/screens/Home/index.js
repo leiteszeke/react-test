@@ -2,6 +2,7 @@
 import React from "react";
 import classnames from 'classnames';
 import { connect } from "react-redux";
+import { PDFDownloadLink } from '@react-pdf/renderer';
 import {
   Button,
   Col,
@@ -13,41 +14,37 @@ import {
   Row
 } from "antd";
 // Actions
-import { addCard, deleteCard, editCard, fetchCards } from "../../actions/card";
+import { addCard, deleteCard, editCard, fetchCards, importCards } from "../../actions/card";
+// Components
+import PrintCards from './components/PrintCards';
 // Styled
 import { Content, Header, Title } from "./styles";
 
-const Home = ({ addCard, cards, deleteCard, editCard, fetchCards, history }) => {
+const Home = ({ addCard, cards, deleteCard, editCard, fetchCards, history, importCards }) => {
   const [showModal, setShowModal] = React.useState(false);
   const [search, setSearch] = React.useState("");
   const [error, setError] = React.useState(false);
   const [card, setCard] = React.useState({});
   const [editing, setEditing] = React.useState(false);
 	const [selected, setSelected] = React.useState(null);
+	const fileRef = React.useRef(null);
 
-  const getNextId = () => {
-    if (cards.length === 0) {
-      return 1;
-    }
-
-    if (cards[cards.length - 1]) {
-      return cards[cards.length - 1].id + 1;
-    }
-  };
+	const getFile = () => fileRef.current.click();
 
   const handleSubmit = () => {
 		if (typeof card.name === 'undefined' || card.name === "") {
 			return setError(true);
 		}
 
+		const cardToSave = {
+			name: card.name,
+			description: card.description ? card.description.substr(0, 140) : '',
+		}
+
     if (editing) {
-      editCard(selected, card);
+      editCard(selected, cardToSave);
     } else {
-      addCard({
-				id: getNextId(),
-				name: card.name,
-				description: card.description
-			});
+      addCard(cardToSave);
     }
     setCard({});
     setShowModal(false);
@@ -80,6 +77,15 @@ const Home = ({ addCard, cards, deleteCard, editCard, fetchCards, history }) =>
     setShowModal(true);
 	};
 
+	const exportCards = () => {
+    const data = 'data:application/json;charset=utf-8,'+ encodeURIComponent(JSON.stringify(cards, null, 2));
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', data);
+    linkElement.setAttribute('download', 'cards.json');
+		linkElement.click();
+		linkElement.remove();
+	}
+
   const deleteItem = item => () => {
     deleteCard(item.id);
 	};
@@ -91,7 +97,31 @@ const Home = ({ addCard, cards, deleteCard, editCard, fetchCards, history }) =>
 
 	React.useEffect(() => {
 		fetchCards();
-	}, [fetchCards])
+	}, [fetchCards]);
+
+	const importFile = React.useCallback((e) => {
+		const file = e.target.files[0];
+
+		if (file) {
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				const fileCards = JSON.parse(e.target.result);
+				importCards(fileCards);
+			};
+			reader.readAsText(file);
+		}
+	}, [importCards]);
+
+	React.useEffect(() => {
+		const file = fileRef.current;
+		file.addEventListener('change', importFile);
+
+		return () => {
+			if (file) {
+				file.removeEventListener('change', importFile);
+			}
+		}
+	}, [fileRef, importFile]);
 
   React.useEffect(() => {
     if (!showModal && editing) {
@@ -121,7 +151,6 @@ const Home = ({ addCard, cards, deleteCard, editCard, fetchCards, history }) =>
           </Col>
         </Row>
         <Divider />
-
         <Row>
           <List
             bordered
@@ -145,6 +174,31 @@ const Home = ({ addCard, cards, deleteCard, editCard, fetchCards, history }) =>
               </List.Item>
             )}
           />
+        </Row>
+        <Divider />
+        <Row type="flex" justify="space-between">
+          <Col>
+						<input ref={fileRef} accept="application/json" className="hidden" type="file" />
+						<Button onClick={getFile}>
+							Import
+						</Button>
+          </Col>
+					{ cards.length > 0 && (
+						<>
+							<Col>
+								<Button onClick={exportCards}>
+									Export
+								</Button>
+							</Col>
+							<Col>
+								<Button>
+									<PDFDownloadLink document={<PrintCards cards={cards} />} fileName="cards.pdf">
+										Download as PDF
+									</PDFDownloadLink>
+								</Button>
+							</Col>
+						</>
+					)}
         </Row>
       </Content>
       <Modal
@@ -192,7 +246,8 @@ const mapDispatchToProps = dispatch => ({
 	addCard: (data) => dispatch(addCard(data)),
 	deleteCard: (id) => dispatch(deleteCard(id)),
 	editCard: (id, data) => dispatch(editCard(id, data)),
-	fetchCards: () => dispatch(fetchCards())
+	fetchCards: () => dispatch(fetchCards()),
+	importCards: (data) => dispatch(importCards(data))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);
