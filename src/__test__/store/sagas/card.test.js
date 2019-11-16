@@ -4,7 +4,9 @@ import * as api from "../../../services/cards";
 import {
   fetchCards as fetch,
   addCard as add,
-  editCard as edit
+	editCard as edit,
+	getCard as get,
+	deleteCard as remove,
 } from "../../../sagas/resources/card";
 // Utils
 import { recordSaga } from "../../utils";
@@ -13,8 +15,10 @@ import { mockCard } from "../../../mocks/card";
 // Types
 import {
   CARDS_FETCHED_SUCCESS,
-  CARD_CREATE_SUCCESS,
-  CARD_EDIT_SUCCESS
+	CARD_CREATE_SUCCESS,
+	CARD_DELETE_SUCCESS,
+  CARD_EDIT_SUCCESS,
+	CARD_FETCHED_SUCCESS
 } from "../../../actions";
 
 describe("Card Saga", () => {
@@ -26,6 +30,16 @@ describe("Card Saga", () => {
   const createSuccess = {
     payload: { cards: [mockCard] },
     type: CARD_CREATE_SUCCESS
+	};
+
+  const getSuccess = {
+    payload: { card: mockCard },
+    type: CARD_FETCHED_SUCCESS
+	};
+
+  const deleteSuccess = {
+    payload: { cards: [] },
+    type: CARD_DELETE_SUCCESS
   };
 
   const editSuccess = {
@@ -38,6 +52,8 @@ describe("Card Saga", () => {
   api.fetchCards = jest.fn();
   api.addCard = jest.fn();
   api.editCard = jest.fn();
+  api.getCard = jest.fn();
+  api.deleteCard = jest.fn();
 
   it("get success fetch", async () => {
     api.fetchCards.mockImplementationOnce(() => [mockCard]);
@@ -71,5 +87,19 @@ describe("Card Saga", () => {
     });
     expect(api.editCard).toHaveBeenCalled();
     expect(dispatched).toContainEqual(editSuccess);
+	});
+
+  it("get a card", async () => {
+    api.getCard.mockImplementationOnce(() => ({ ...mockCard }));
+    const dispatched = await recordSaga(get, { payload: 1 });
+    expect(api.getCard).toHaveBeenCalled();
+    expect(dispatched).toContainEqual(getSuccess);
+  });
+
+  it("delete a card", async () => {
+    api.deleteCard.mockImplementationOnce(() => ([]));
+    const dispatched = await recordSaga(remove, { payload: 1 });
+    expect(api.deleteCard).toHaveBeenCalled();
+    expect(dispatched).toContainEqual(deleteSuccess);
   });
 });

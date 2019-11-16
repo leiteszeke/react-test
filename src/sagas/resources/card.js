@@ -6,8 +6,12 @@ import { call, put } from "redux-saga/effects";
 import {
   CARD_CREATE_FAILED,
   CARD_CREATE_SUCCESS,
+  CARD_DELETE_FAILED,
+  CARD_DELETE_SUCCESS,
   CARD_EDIT_FAILED,
   CARD_EDIT_SUCCESS,
+  CARD_FETCHED_FAILED,
+  CARD_FETCHED_SUCCESS,
   CARDS_FETCHED_FAILED,
   CARDS_FETCHED_SUCCESS
 } from "../../actions";
@@ -61,8 +65,40 @@ export function* fetchCards() {
   }
 }
 
+export function* deleteCard(action) {
+  try {
+    const data = yield call(api.deleteCard, action.payload);
+
+    yield put({
+      type: CARD_DELETE_SUCCESS,
+      payload: {
+        cards: data
+      }
+    });
+  } catch (e) {
+    yield put({ type: CARD_DELETE_FAILED, message: e.message });
+  }
+}
+
+export function* getCard(action) {
+  try {
+    const data = yield call(api.getCard, action.payload);
+
+    yield put({
+      type: CARD_FETCHED_SUCCESS,
+      payload: {
+        card: data
+      }
+    });
+  } catch (e) {
+    yield put({ type: CARD_FETCHED_FAILED, message: e.message });
+  }
+}
+
 export default {
   addCard,
-  editCard,
+	editCard,
+	deleteCard,
+	getCard,
   fetchCards
 };

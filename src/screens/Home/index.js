@@ -10,15 +10,14 @@ import {
   Input,
   List,
   Modal,
-  Row,
-  Typography
+  Row
 } from "antd";
 // Actions
-import { addCard, editCard, fetchCards } from "../../actions/card";
+import { addCard, deleteCard, editCard, fetchCards } from "../../actions/card";
 // Styled
-import { Content } from "./styles";
+import { Content, Header, Title } from "./styles";
 
-const Home = ({ addCard, cards, editCard, fetchCards }) => {
+const Home = ({ addCard, cards, deleteCard, editCard, fetchCards, history }) => {
   const [showModal, setShowModal] = React.useState(false);
   const [search, setSearch] = React.useState("");
   const [error, setError] = React.useState(false);
@@ -37,7 +36,7 @@ const Home = ({ addCard, cards, editCard, fetchCards }) => {
   };
 
   const handleSubmit = () => {
-		if (card.name === "") {
+		if (typeof card.name === 'undefined' || card.name === "") {
 			return setError(true);
 		}
 
@@ -81,6 +80,15 @@ const Home = ({ addCard, cards, editCard, fetchCards }) => {
     setShowModal(true);
 	};
 
+  const deleteItem = item => () => {
+    deleteCard(item.id);
+	};
+
+	const viewItem = (item) => () => history.push({
+		pathname: `/cards/${item.id}`,
+		state: { id: item.id }
+	});
+
 	React.useEffect(() => {
 		fetchCards();
 	}, [fetchCards])
@@ -90,16 +98,16 @@ const Home = ({ addCard, cards, editCard, fetchCards }) => {
       setEditing(false);
       setSelected(null);
     }
-  }, [editing, showModal]);
+	}, [editing, showModal]);
 
-  const filteredCards = cards.filter(card => card.name.includes(search));
+  const filteredCards = cards.filter(card => card.name && card.name.includes(search));
 
   return (
     <React.Fragment>
       <Content>
-        <Row type="flex" justify="center">
-          <Typography.Title>Card Game Maker</Typography.Title>
-        </Row>
+        <Header>
+          <Title>Card Game Maker</Title>
+        </Header>
         <Row type="flex" justify="space-between">
           <Col span={18}>
             <Input
@@ -120,12 +128,17 @@ const Home = ({ addCard, cards, editCard, fetchCards }) => {
             dataSource={filteredCards}
             renderItem={item => (
               <List.Item
-                actions={[<Icon type="edit" onClick={editItem(item)} />]}
+								style={{ paddingLeft: 12, paddingRight: 12 }}
+                actions={[
+									<Icon type="delete" onClick={deleteItem(item)} />,
+									<Icon type="eye" onClick={viewItem(item)} />,
+									<Icon type="edit" onClick={editItem(item)} />
+								]}
               >
                 <Row
                   type="flex"
                   justify="space-between"
-                  style={{ width: "100%" }}
+                  style={{ flex: 1 }}
                 >
                   {item.name}
                 </Row>
@@ -149,7 +162,7 @@ const Home = ({ addCard, cards, editCard, fetchCards }) => {
       >
         <Input
 					className={classnames({error})}
-          placeholder="Name"
+          placeholder="Name *"
           type="text"
           name="name"
           onChange={handleChange}
@@ -158,8 +171,9 @@ const Home = ({ addCard, cards, editCard, fetchCards }) => {
         <br />
         <br />
         <Input.TextArea
-          placeholder="Descme"
-          name="description"
+          placeholder="Description"
+					name="description"
+					maxLength={140}
           onChange={handleChange}
           autoSize={{ minRows: 2, maxRows: 3 }}
           value={card.description}
@@ -176,6 +190,7 @@ const mapStateToProps = ({ cards: { cards } }) => ({
 
 const mapDispatchToProps = dispatch => ({
 	addCard: (data) => dispatch(addCard(data)),
+	deleteCard: (id) => dispatch(deleteCard(id)),
 	editCard: (id, data) => dispatch(editCard(id, data)),
 	fetchCards: () => dispatch(fetchCards())
 });

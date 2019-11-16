@@ -1,14 +1,24 @@
 // Actions
-import { ADD_CARD, EDIT_CARD, FETCH_CARDS } from '../actions';
+import { ADD_CARD, DELETE_CARD, EDIT_CARD, FETCH_CARDS, GET_CARD } from '../actions';
 
 export const addCard = (data) => ({
 	type: ADD_CARD,
 	payload: data
 })
 
+export const deleteCard = (id) => ({
+	type: DELETE_CARD,
+	payload: id
+})
+
 export const editCard = (id, data) => ({
 	type: EDIT_CARD,
 	payload: { id, data }
+})
+
+export const getCard = (id) => ({
+	type: GET_CARD,
+	payload: id
 })
 
 export const fetchCards = () => ({

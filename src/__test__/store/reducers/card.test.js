@@ -2,7 +2,8 @@
 import {
   CARDS_FETCHED_SUCCESS,
   CARD_EDIT_SUCCESS,
-  CARD_CREATE_SUCCESS
+  CARD_CREATE_SUCCESS,
+	CARD_DELETE_SUCCESS
 } from "../../../actions";
 // Reducer
 import reducer from "../../../reducers/cards";
@@ -11,7 +12,8 @@ import { mockCard } from "../../../mocks/card";
 
 describe("Login store reducer", () => {
   const initialState = {
-    cards: []
+		cards: [],
+		card: {}
   };
 
   it("Should return the initial state", () => {
@@ -43,5 +45,14 @@ describe("Login store reducer", () => {
         type: CARD_EDIT_SUCCESS
       })
     ).toEqual({ ...initialState, cards: [mockCard] });
+	});
+
+  it("should fetch cards after delete", () => {
+    expect(
+      reducer(initialState, {
+        payload: { cards: [] },
+        type: CARD_DELETE_SUCCESS
+      })
+    ).toEqual({ ...initialState, cards: [] });
   });
 });
