@@ -10,13 +10,15 @@ import {
   Icon,
   Input,
   List,
-  Modal,
+	Modal,
+	Popconfirm,
   Row
 } from "antd";
 // Actions
 import { addCard, deleteCard, editCard, fetchCards, importCards } from "../../actions/card";
 // Components
 import PrintCards from './components/PrintCards';
+import Notification from './components/Notification';
 // Styled
 import { Content, Header, Title } from "./styles";
 
@@ -159,7 +161,14 @@ const Home = ({ addCard, cards, deleteCard, editCard, fetchCards, history, impo
               <List.Item
 								style={{ paddingLeft: 12, paddingRight: 12 }}
                 actions={[
-									<Icon type="delete" onClick={deleteItem(item)} />,
+									<Popconfirm
+										title="Are you sure delete this card?"
+										onConfirm={deleteItem(item)}
+										okText="Yes"
+										cancelText="No"
+									>
+										<Icon type="delete" />
+									</Popconfirm>,
 									<Icon type="eye" onClick={viewItem(item)} />,
 									<Icon type="edit" onClick={editItem(item)} />
 								]}
@@ -233,6 +242,7 @@ const Home = ({ addCard, cards, deleteCard, editCard, fetchCards, history, impo
           value={card.description}
         />
       </Modal>
+			<Notification />
     </React.Fragment>
   );
 };
